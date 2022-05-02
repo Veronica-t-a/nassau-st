@@ -1,1 +1,1 @@
-export { default as HJewelers } from './HJewelers.js';
+export { default as Hjewelers } from './Hjewelers.js';

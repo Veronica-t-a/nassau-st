@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, HJewelers, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench, Tree } from 'objects';
+import { Flower, Land, Hjewelers, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench, Tree } from 'objects';
 import { BasicLights } from 'lights';
 
 class SeedScene extends Scene {
@@ -23,7 +23,7 @@ class SeedScene extends Scene {
         const land = new Land();
         const flower = new Flower(this);
         const lights = new BasicLights();
-        const hjewelers = new HJewelers();
+        const hjewelers = new Hjewelers();
         const starbucks = new Starbucks();
         const landau = new Landau();
         const tacoria = new Tacoria();

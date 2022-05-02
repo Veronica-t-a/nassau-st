@@ -2,7 +2,7 @@ import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import MODEL from './hjewelers.gltf';
 
-class HJewelers extends Group {
+class Hjewelers extends Group {
     constructor() {
         // Call parent Group() constructor
         super();
@@ -17,4 +17,4 @@ class HJewelers extends Group {
     }
 }
 
-export default HJewelers;
+export default Hjewelers;
