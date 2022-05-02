@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Starbucks, HJewelers, Trashcan, Bench } from 'objects';
+import { Flower, Land, HJewelers, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench } from 'objects';
 import { BasicLights } from 'lights';
 
 class SeedScene extends Scene {
@@ -23,11 +23,15 @@ class SeedScene extends Scene {
         const land = new Land();
         const flower = new Flower(this);
         const lights = new BasicLights();
-        const starbucks = new Starbucks();
         const hjewelers = new HJewelers();
+        const starbucks = new Starbucks();
+        const landau = new Landau();
+        const tacoria = new Tacoria();
+        const ustore = new Ustore();
+        const labyrinth = new Labyrinth();
         const trashcan = new Trashcan();
         const bench = new Bench();
-        this.add(lights, starbucks);
+        this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
