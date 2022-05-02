@@ -1,6 +1,6 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './trashcan.gltf';
+import MODEL from './Trashcan.gltf';
 
 class Trashcan extends Group {
     constructor() {
@@ -9,7 +9,7 @@ class Trashcan extends Group {
 
         const loader = new GLTFLoader();
 
-        this.name = 'trashcan';
+        this.name = 'Trashcan';
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);

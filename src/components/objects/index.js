@@ -1,6 +1,5 @@
 export * from './Flower';
 export * from './Land';
-export * from './Hjewelers';
 export * from './Starbucks';
 export * from './Landau';
 export * from './Tacoria';
