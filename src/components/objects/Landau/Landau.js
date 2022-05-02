@@ -1,6 +1,6 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './Landau.gltf';
+import MODEL from './landau.gltf';
 
 class Landau extends Group {
     constructor() {
@@ -9,7 +9,7 @@ class Landau extends Group {
 
         const loader = new GLTFLoader();
 
-        this.name = 'Landau';
+        this.name = 'landau';
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);

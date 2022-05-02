@@ -1,15 +1,15 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './labyrinth.gltf';
+import MODEL from './bench.gltf';
 
-class Labyrinth extends Group {
+class Bench extends Group {
     constructor() {
         // Call parent Group() constructor
         super();
 
         const loader = new GLTFLoader();
 
-        this.name = 'labyrinth';
+        this.name = 'bench';
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
@@ -17,4 +17,4 @@ class Labyrinth extends Group {
     }
 }
 
-export default Labyrinth;
+export default Bench;

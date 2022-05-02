@@ -10,7 +10,7 @@ class Land extends Group {
         const loader = new GLTFLoader();
 
         this.name = 'land';
-
+        
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
         });

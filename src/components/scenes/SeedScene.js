@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Landau, Tacoria, Labyrinth, Ustore, Starbucks} from 'objects';
+import { Flower, Land, Hjewelers, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench, Tree } from 'objects';
 import { BasicLights } from 'lights';
 
 class SeedScene extends Scene {
@@ -16,18 +16,23 @@ class SeedScene extends Scene {
         };
 
         // Set background to a nice color
-        this.background = new Color(0x7ec0ee);
+        // this.background = new Color(0x7ec0ee);
+        this.background = new Color(0xcd8abf);
 
         // Add meshes to scene
         const land = new Land();
         const flower = new Flower(this);
         const lights = new BasicLights();
+        const hjewelers = new Hjewelers();
+        const starbucks = new Starbucks();
         const landau = new Landau();
         const tacoria = new Tacoria();
-        const labyrinth = new Labyrinth();
         const ustore = new Ustore();
-        const starbucks = new Starbucks();
-        this.add(land, flower, lights, landau, tacoria, labyrinth, ustore, starbucks);
+        const labyrinth = new Labyrinth();
+        const trashcan = new Trashcan();
+        const bench = new Bench();
+        const tree = new Tree();
+        this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth, trashcan, bench, tree);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
@@ -39,7 +44,7 @@ class SeedScene extends Scene {
 
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
-        this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         // Call update for each object in the updateList
         for (const obj of updateList) {

@@ -1,6 +1,6 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './Tacoria.gltf';
+import MODEL from './tacoria.gltf';
 
 class Tacoria extends Group {
     constructor() {
@@ -9,7 +9,7 @@ class Tacoria extends Group {
 
         const loader = new GLTFLoader();
 
-        this.name = 'Tacoria';
+        this.name = 'tacoria';
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
