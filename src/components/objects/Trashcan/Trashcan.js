@@ -1,20 +1,20 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './land.gltf';
+import MODEL from './trashcan.gltf';
 
-class Land extends Group {
+class Trashcan extends Group {
     constructor() {
         // Call parent Group() constructor
         super();
 
         const loader = new GLTFLoader();
 
-        this.name = 'land';
-        
+        this.name = 'trashcan';
+
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
         });
     }
 }
 
-export default Land;
+export default Trashcan;
