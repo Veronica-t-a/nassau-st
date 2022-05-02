@@ -105,6 +105,5 @@ dist
 
 .DS_Store
 *.blend
-referencepics/
 
 build/
