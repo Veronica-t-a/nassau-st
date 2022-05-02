@@ -8,3 +8,4 @@ export * from './Ustore';
 export * from './Labyrinth';
 export * from './Trashcan';
 export * from './Bench';
+export * from './Tree';
