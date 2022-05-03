@@ -13,6 +13,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// import MODEL from './components/objects/girl/girl.fbx';
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -45,8 +46,8 @@ class BasicCharacterController {
 
   _LoadModels() {
     const loader = new FBXLoader();
-    loader.setPath('src/components/objects/girl/');
-    loader.load('girl.fbx', (fbx) => {
+    // loader.setPath('src/components/objects/girl/');
+    loader.load('src/components/objects/girl/girl.fbx', (fbx) => {
       fbx.scale.setScalar(0.03);
       fbx.traverse(c => {
         c.castShadow = true;
@@ -65,7 +66,7 @@ class BasicCharacterController {
       const _OnLoad = (animName, anim) => {
         const clip = anim.animations[0];
         const action = this._mixer.clipAction(clip);
-  
+
         this._animations[animName] = {
           clip: clip,
           action: action,
@@ -73,10 +74,10 @@ class BasicCharacterController {
       };
 
       const loader = new FBXLoader(this._manager);
-      loader.setPath('src/components/objects/girl/');
-      loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
-      loader.load('run.fbx', (a) => { _OnLoad('run', a); });
-      loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
+      // loader.setPath('src/components/objects/girl/');
+      loader.load('src/components/objects/girl/walk.fbx', (a) => { _OnLoad('walk', a); });
+      loader.load('src/components/objects/girl/run.fbx', (a) => { _OnLoad('run', a); });
+      loader.load('src/components/objects/girl/idle.fbx', (a) => { _OnLoad('idle', a); });
     });
   }
 
@@ -155,7 +156,7 @@ class BasicCharacterController {
 
 class BasicCharacterControllerInput {
   constructor() {
-    this._Init();    
+    this._Init();
   }
 
   _Init() {
@@ -224,7 +225,7 @@ class FiniteStateMachine {
 
   SetState(name) {
     const prevState = this._currentState;
-    
+
     if (prevState) {
       if (prevState.Name == name) {
         return;
@@ -486,8 +487,8 @@ class CharacterControllerDemo {
 
   _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
     const loader = new FBXLoader();
-    loader.setPath(path);
-    loader.load(modelFile, (fbx) => {
+    // loader.setPath(path);
+    loader.load(MODEL, (fbx) => {
       fbx.scale.setScalar(0.1);
       fbx.traverse(c => {
         c.castShadow = true;
@@ -495,7 +496,8 @@ class CharacterControllerDemo {
       fbx.position.copy(offset);
 
       const anim = new FBXLoader();
-      anim.setPath(path);
+      // src/components/objects/girl/
+      // anim.setPath(path);
       anim.load(animFile, (anim) => {
         const m = new THREE.AnimationMixer(fbx);
         this._mixers.push(m);
