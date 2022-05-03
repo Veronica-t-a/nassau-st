@@ -45,7 +45,7 @@ class BasicCharacterController {
 
   _LoadModels() {
     const loader = new FBXLoader();
-    loader.setPath('src/components/objects/girl/');
+    loader.setPath('./src/components/objects/girl/');
     loader.load('girl.fbx', (fbx) => {
       fbx.scale.setScalar(0.03);
       fbx.traverse(c => {
@@ -73,7 +73,7 @@ class BasicCharacterController {
       };
 
       const loader = new FBXLoader(this._manager);
-      loader.setPath('src/components/objects/girl/');
+      loader.setPath('./src/components/objects/girl/');
       loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
       loader.load('run.fbx', (a) => { _OnLoad('run', a); });
       loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
