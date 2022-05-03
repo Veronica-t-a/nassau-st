@@ -506,16 +506,6 @@ class CharacterControllerDemo {
     });
   }
 
-  _LoadModel() {
-    const loader = new GLTFLoader();
-    loader.load('./resources/thing.glb', (gltf) => {
-      gltf.scene.traverse(c => {
-        c.castShadow = true;
-      });
-      this._scene.add(gltf.scene);
-    });
-  }
-
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
     this._camera.updateProjectionMatrix();
