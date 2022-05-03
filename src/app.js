@@ -12,7 +12,6 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -482,28 +481,6 @@ class CharacterControllerDemo {
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
-  }
-
-  _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
-    const loader = new FBXLoader();
-    loader.setPath(path);
-    loader.load(modelFile, (fbx) => {
-      fbx.scale.setScalar(0.1);
-      fbx.traverse(c => {
-        c.castShadow = true;
-      });
-      fbx.position.copy(offset);
-
-      const anim = new FBXLoader();
-      anim.setPath(path);
-      anim.load(animFile, (anim) => {
-        const m = new THREE.AnimationMixer(fbx);
-        this._mixers.push(m);
-        const idle = m.clipAction(anim.animations[0]);
-        idle.play();
-      });
-      this._scene.add(fbx);
-    });
   }
 
   _OnWindowResize() {
