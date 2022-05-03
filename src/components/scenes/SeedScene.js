@@ -1,6 +1,7 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench, Road, Tree, Hjewelers, Sidewalk} from 'objects';
+import { CubeTextureLoader, sRGBEncoding } from 'three';
+import { Land, Starbucks, Landau, Tacoria, Ustore, Labyrinth, Trashcan, Bench, Tree } from 'objects';
 import { BasicLights } from 'lights';
 
 class SeedScene extends Scene {
@@ -16,12 +17,10 @@ class SeedScene extends Scene {
         };
 
         // Set background to a nice color
-        // this.background = new Color(0x7ec0ee);
-        this.background = new Color(0xcd8abf);
+        this.background = new Color(0x7ec0ee);
 
         // Add meshes to scene
         const land = new Land();
-        const flower = new Flower(this);
         const lights = new BasicLights();
         const starbucks = new Starbucks();
         const landau = new Landau();
@@ -31,11 +30,7 @@ class SeedScene extends Scene {
         const trashcan = new Trashcan();
         const bench = new Bench();
         const tree = new Tree();
-        const road = new Road();
-        const hjewelers = new Hjewelers();
-        const sidewalk = new Sidewalk();
-        // const car = new Car();
-        this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth, trashcan, bench, road, hjewelers, sidewalk);
+        this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth, trashcan, bench, tree);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
@@ -46,8 +41,7 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp) {
-        const { rotationSpeed, updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        const { updateList } = this.state;
 
         // Call update for each object in the updateList
         for (const obj of updateList) {
