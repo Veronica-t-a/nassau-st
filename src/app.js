@@ -47,9 +47,6 @@ class BasicCharacterController {
     loader.setPath('./src/components/objects/girl/');
     loader.load('girl.fbx', (fbx) => {
       fbx.scale.setScalar(0.03);
-      fbx.traverse(c => {
-        c.castShadow = true;
-      });
 
       this._target = fbx;
       this._params.scene.add(this._target);
@@ -74,7 +71,6 @@ class BasicCharacterController {
       const loader = new FBXLoader(this._manager);
       loader.setPath('./src/components/objects/girl/');
       loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
-      loader.load('run.fbx', (a) => { _OnLoad('run', a); });
       loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
     });
   }
@@ -104,9 +100,6 @@ class BasicCharacterController {
     const _R = controlObject.quaternion.clone();
 
     const acc = this._acceleration.clone();
-    if (this._input._keys.shift) {
-      acc.multiplyScalar(2.0);
-    }
 
     if (this._input._keys.forward) {
       velocity.z += acc.z * timeInSeconds;
@@ -163,7 +156,6 @@ class BasicCharacterControllerInput {
       backward: false,
       left: false,
       right: false,
-      shift: false,
     };
     document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
     document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
@@ -183,9 +175,6 @@ class BasicCharacterControllerInput {
       case 68: // d
         this._keys.right = true;
         break;
-      case 16: // SHIFT
-        this._keys.shift = true;
-        break;
     }
   }
 
@@ -202,9 +191,6 @@ class BasicCharacterControllerInput {
         break;
       case 68: // d
         this._keys.right = false;
-        break;
-      case 16: // SHIFT
-        this._keys.shift = false;
         break;
     }
   }
@@ -255,7 +241,6 @@ class CharacterFSM extends FiniteStateMachine {
   _Init() {
     this._AddState('idle', IdleState);
     this._AddState('walk', WalkState);
-    this._AddState('run', RunState);
   }
 };
 
@@ -287,14 +272,9 @@ class WalkState extends State {
 
       curAction.enabled = true;
 
-      if (prevState.Name == 'run') {
-        const ratio = curAction.getClip().duration / prevAction.getClip().duration;
-        curAction.time = prevAction.time * ratio;
-      } else {
-        curAction.time = 0.0;
-        curAction.setEffectiveTimeScale(1.0);
-        curAction.setEffectiveWeight(1.0);
-      }
+      curAction.time = 0.0;
+      curAction.setEffectiveTimeScale(1.0);
+      curAction.setEffectiveWeight(1.0);
 
       curAction.crossFadeFrom(prevAction, 0.5, true);
       curAction.play();
@@ -308,57 +288,6 @@ class WalkState extends State {
 
   Update(timeElapsed, input) {
     if (input._keys.forward || input._keys.backward) {
-      if (input._keys.shift) {
-        this._parent.SetState('run');
-      }
-      return;
-    }
-
-    this._parent.SetState('idle');
-  }
-};
-
-
-class RunState extends State {
-  constructor(parent) {
-    super(parent);
-  }
-
-  get Name() {
-    return 'run';
-  }
-
-  Enter(prevState) {
-    const curAction = this._parent._proxy._animations['run'].action;
-    if (prevState) {
-      const prevAction = this._parent._proxy._animations[prevState.Name].action;
-
-      curAction.enabled = true;
-
-      if (prevState.Name == 'walk') {
-        const ratio = curAction.getClip().duration / prevAction.getClip().duration;
-        curAction.time = prevAction.time * ratio;
-      } else {
-        curAction.time = 0.0;
-        curAction.setEffectiveTimeScale(1.0);
-        curAction.setEffectiveWeight(1.0);
-      }
-
-      curAction.crossFadeFrom(prevAction, 0.5, true);
-      curAction.play();
-    } else {
-      curAction.play();
-    }
-  }
-
-  Exit() {
-  }
-
-  Update(timeElapsed, input) {
-    if (input._keys.forward || input._keys.backward) {
-      if (!input._keys.shift) {
-        this._parent.SetState('walk');
-      }
       return;
     }
 
