@@ -8,3 +8,8 @@ export * from './Labyrinth';
 export * from './Trashcan';
 export * from './Bench';
 export * from './Tree';
+export * from './Road';
+export * from './Hjewelers';
+export * from './Sidewalk';
+
+// export * from './Car';
