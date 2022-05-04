@@ -35,7 +35,6 @@ class SeedScene extends Scene {
         this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth, trashcan, bench, road, hjewelers, sidewalk, tree);
 
         // Populate GUI
-        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
         this.state.gui.add(this.state, 'speed', 0, 200);
     }
 
