@@ -11,8 +11,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -44,26 +43,18 @@ class BasicCharacterController {
   }
 
   _LoadModels() {
-    const loader = new FBXLoader();
-    loader.setPath('./src/components/objects/girl/');
-    loader.load('girl.fbx', (fbx) => {
-      fbx.scale.setScalar(0.03);
-      fbx.traverse(c => {
-        c.castShadow = true;
-      });
-
-      this._target = fbx;
+    const loader = new GLTFLoader();
+    loader.load('src/components/objects/girl/girl.gltf', (gltf) => {
+      gltf.scene.scale.setScalar(3);
+      this._target = gltf.scene;
       this._params.scene.add(this._target);
-
       this._mixer = new THREE.AnimationMixer(this._target);
-
       this._manager = new THREE.LoadingManager();
       this._manager.onLoad = () => {
         this._stateMachine.SetState('idle');
       };
-
       const _OnLoad = (animName, anim) => {
-        const clip = anim.animations[0];
+        const clip = anim.animations[anim.animations.length - 1];
         const action = this._mixer.clipAction(clip);
   
         this._animations[animName] = {
@@ -72,11 +63,10 @@ class BasicCharacterController {
         };
       };
 
-      const loader = new FBXLoader(this._manager);
-      loader.setPath('./src/components/objects/girl/');
-      loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
-      loader.load('run.fbx', (a) => { _OnLoad('run', a); });
-      loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
+      const loader = new GLTFLoader(this._manager);
+      loader.setPath('src/components/objects/girl/');
+      loader.load('walk.gltf', (a) => { _OnLoad('walk', a); });
+      loader.load('idle.gltf', (a) => { _OnLoad('idle', a); });
     });
   }
 
@@ -105,9 +95,6 @@ class BasicCharacterController {
     const _R = controlObject.quaternion.clone();
 
     const acc = this._acceleration.clone();
-    if (this._input._keys.shift) {
-      acc.multiplyScalar(2.0);
-    }
 
     if (this._input._keys.forward) {
       velocity.z += acc.z * timeInSeconds;
@@ -164,7 +151,6 @@ class BasicCharacterControllerInput {
       backward: false,
       left: false,
       right: false,
-      shift: false,
     };
     document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
     document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
@@ -184,9 +170,6 @@ class BasicCharacterControllerInput {
       case 68: // d
         this._keys.right = true;
         break;
-      case 16: // SHIFT
-        this._keys.shift = true;
-        break;
     }
   }
 
@@ -203,9 +186,6 @@ class BasicCharacterControllerInput {
         break;
       case 68: // d
         this._keys.right = false;
-        break;
-      case 16: // SHIFT
-        this._keys.shift = false;
         break;
     }
   }
@@ -256,10 +236,8 @@ class CharacterFSM extends FiniteStateMachine {
   _Init() {
     this._AddState('idle', IdleState);
     this._AddState('walk', WalkState);
-    this._AddState('run', RunState);
   }
 };
-
 
 class State {
   constructor(parent) {
@@ -288,14 +266,9 @@ class WalkState extends State {
 
       curAction.enabled = true;
 
-      if (prevState.Name == 'run') {
-        const ratio = curAction.getClip().duration / prevAction.getClip().duration;
-        curAction.time = prevAction.time * ratio;
-      } else {
-        curAction.time = 0.0;
-        curAction.setEffectiveTimeScale(1.0);
-        curAction.setEffectiveWeight(1.0);
-      }
+      curAction.time = 0.0;
+      curAction.setEffectiveTimeScale(1.0);
+      curAction.setEffectiveWeight(1.0);
 
       curAction.crossFadeFrom(prevAction, 0.5, true);
       curAction.play();
@@ -309,57 +282,6 @@ class WalkState extends State {
 
   Update(timeElapsed, input) {
     if (input._keys.forward || input._keys.backward) {
-      if (input._keys.shift) {
-        this._parent.SetState('run');
-      }
-      return;
-    }
-
-    this._parent.SetState('idle');
-  }
-};
-
-
-class RunState extends State {
-  constructor(parent) {
-    super(parent);
-  }
-
-  get Name() {
-    return 'run';
-  }
-
-  Enter(prevState) {
-    const curAction = this._parent._proxy._animations['run'].action;
-    if (prevState) {
-      const prevAction = this._parent._proxy._animations[prevState.Name].action;
-
-      curAction.enabled = true;
-
-      if (prevState.Name == 'walk') {
-        const ratio = curAction.getClip().duration / prevAction.getClip().duration;
-        curAction.time = prevAction.time * ratio;
-      } else {
-        curAction.time = 0.0;
-        curAction.setEffectiveTimeScale(1.0);
-        curAction.setEffectiveWeight(1.0);
-      }
-
-      curAction.crossFadeFrom(prevAction, 0.5, true);
-      curAction.play();
-    } else {
-      curAction.play();
-    }
-  }
-
-  Exit() {
-  }
-
-  Update(timeElapsed, input) {
-    if (input._keys.forward || input._keys.backward) {
-      if (!input._keys.shift) {
-        this._parent.SetState('walk');
-      }
       return;
     }
 
@@ -378,6 +300,7 @@ class IdleState extends State {
   }
 
   Enter(prevState) {
+    console.log(this._parent._proxy._animations)
     const idleAction = this._parent._proxy._animations['idle'].action;
     if (prevState) {
       const prevAction = this._parent._proxy._animations[prevState.Name].action;
@@ -482,28 +405,6 @@ class CharacterControllerDemo {
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
-  }
-
-  _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
-    const loader = new FBXLoader();
-    loader.setPath(path);
-    loader.load(modelFile, (fbx) => {
-      fbx.scale.setScalar(0.1);
-      fbx.traverse(c => {
-        c.castShadow = true;
-      });
-      fbx.position.copy(offset);
-
-      const anim = new FBXLoader();
-      anim.setPath(path);
-      anim.load(animFile, (anim) => {
-        const m = new THREE.AnimationMixer(fbx);
-        this._mixers.push(m);
-        const idle = m.clipAction(anim.animations[0]);
-        idle.play();
-      });
-      this._scene.add(fbx);
-    });
   }
 
   _OnWindowResize() {
