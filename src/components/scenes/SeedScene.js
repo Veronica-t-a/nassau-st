@@ -34,12 +34,6 @@ class SeedScene extends Scene {
         const sidewalk = new Sidewalk();
         this.add(lights, land, starbucks, landau, tacoria, ustore, labyrinth, trashcan, bench, road, hjewelers, sidewalk, tree);
 
-        let light = new DirectionalLight(0xFFFFFF, 1.0);
-        this.add(light);
-
-        light = new AmbientLight(0xFFFFFF, 0.25);
-        this.add(light);
-
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
