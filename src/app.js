@@ -13,6 +13,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+let cam;
+
 class BasicCharacterControllerProxy {
   constructor(animations) {
     this._animations = animations;
@@ -44,7 +46,7 @@ class BasicCharacterController {
 
   _LoadModels() {
     const loader = new GLTFLoader();
-    loader.load('src/components/objects/girl/girl.gltf', (gltf) => {
+    loader.load('./src/components/objects/girl/girl.gltf', (gltf) => {
       gltf.scene.scale.setScalar(3);
       this._target = gltf.scene;
       this._params.scene.add(this._target);
@@ -64,7 +66,7 @@ class BasicCharacterController {
       };
 
       const loader = new GLTFLoader(this._manager);
-      loader.setPath('src/components/objects/girl/');
+      loader.setPath('./src/components/objects/girl/');
       loader.load('walk.gltf', (a) => { _OnLoad('walk', a); });
       loader.load('idle.gltf', (a) => { _OnLoad('idle', a); });
     });
@@ -115,9 +117,6 @@ class BasicCharacterController {
 
     controlObject.quaternion.copy(_R);
 
-    const oldPosition = new THREE.Vector3();
-    oldPosition.copy(controlObject.position);
-
     const forward = new THREE.Vector3(0, 0, 1);
     forward.applyQuaternion(controlObject.quaternion);
     forward.normalize();
@@ -131,8 +130,9 @@ class BasicCharacterController {
 
     controlObject.position.add(forward);
     controlObject.position.add(sideways);
-
-    oldPosition.copy(controlObject.position);
+    
+    cam.position.add(forward);
+    cam.position.add(sideways);
 
     if (this._mixer) {
       this._mixer.update(timeInSeconds);
@@ -249,6 +249,21 @@ class State {
   Update() {}
 };
 
+function enter(name, prevState, proxy) {
+  const curAction = proxy._animations[name].action;
+  if (prevState) {
+    const prevAction = proxy._animations[prevState.Name].action;
+    curAction.enabled = true;
+    curAction.time = 0.0;
+    curAction.setEffectiveTimeScale(1.0);
+    curAction.setEffectiveWeight(1.0);
+    curAction.crossFadeFrom(prevAction, 0.5, true);
+    curAction.play();
+  } else {
+    curAction.play();
+  }
+}
+
 
 class WalkState extends State {
   constructor(parent) {
@@ -260,21 +275,7 @@ class WalkState extends State {
   }
 
   Enter(prevState) {
-    const curAction = this._parent._proxy._animations['walk'].action;
-    if (prevState) {
-      const prevAction = this._parent._proxy._animations[prevState.Name].action;
-
-      curAction.enabled = true;
-
-      curAction.time = 0.0;
-      curAction.setEffectiveTimeScale(1.0);
-      curAction.setEffectiveWeight(1.0);
-
-      curAction.crossFadeFrom(prevAction, 0.5, true);
-      curAction.play();
-    } else {
-      curAction.play();
-    }
+    enter('walk', prevState, this._parent._proxy);
   }
 
   Exit() {
@@ -300,19 +301,7 @@ class IdleState extends State {
   }
 
   Enter(prevState) {
-    console.log(this._parent._proxy._animations)
-    const idleAction = this._parent._proxy._animations['idle'].action;
-    if (prevState) {
-      const prevAction = this._parent._proxy._animations[prevState.Name].action;
-      idleAction.time = 0.0;
-      idleAction.enabled = true;
-      idleAction.setEffectiveTimeScale(1.0);
-      idleAction.setEffectiveWeight(1.0);
-      idleAction.crossFadeFrom(prevAction, 0.5, true);
-      idleAction.play();
-    } else {
-      idleAction.play();
-    }
+    enter('idle', prevState, this._parent._proxy)
   }
 
   Exit() {
@@ -352,45 +341,16 @@ class CharacterControllerDemo {
     const near = 1.0;
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this._camera.position.set(25, 10, 25);
+    this._camera.position.set(50, 10, 0);
 
     const scene = new SeedScene();
     this._scene = scene;
 
-    let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-    light.position.set(-100, 100, 100);
-    light.target.position.set(0, 0, 0);
-    light.castShadow = true;
-    light.shadow.bias = -0.001;
-    light.shadow.mapSize.width = 4096;
-    light.shadow.mapSize.height = 4096;
-    light.shadow.camera.near = 0.1;
-    light.shadow.camera.far = 500.0;
-    light.shadow.camera.near = 0.5;
-    light.shadow.camera.far = 500.0;
-    light.shadow.camera.left = 50;
-    light.shadow.camera.right = -50;
-    light.shadow.camera.top = 50;
-    light.shadow.camera.bottom = -50;
-    this._scene.add(light);
-
-    light = new THREE.AmbientLight(0xFFFFFF, 0.25);
-    this._scene.add(light);
-
+    cam = this._camera;
     const controls = new OrbitControls(
-      this._camera, this._threejs.domElement);
+      cam, this._threejs.domElement);
     controls.target.set(0, 10, 0);
     controls.update();
-
-    const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(100, 100, 10, 10),
-        new THREE.MeshStandardMaterial({
-            color: 0x808080,
-          }));
-    plane.castShadow = false;
-    plane.receiveShadow = true;
-    plane.rotation.x = -Math.PI / 2;
-    this._scene.add(plane);
 
     this._mixers = [];
     this._previousRAF = null;
@@ -401,16 +361,17 @@ class CharacterControllerDemo {
 
   _LoadAnimatedModel() {
     const params = {
-      camera: this._camera,
+      camera: cam,
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
   }
 
   _OnWindowResize() {
-    this._camera.aspect = window.innerWidth / window.innerHeight;
-    this._camera.updateProjectionMatrix();
-    this._threejs.setSize(window.innerWidth, window.innerHeight);
+    const { innerHeight, innerWidth } = window;
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
   }
 
   _RAF() {
@@ -421,7 +382,7 @@ class CharacterControllerDemo {
 
       this._RAF();
 
-      this._threejs.render(this._scene, this._camera);
+      this._threejs.render(this._scene, cam);
       this._Step(t - this._previousRAF);
       this._previousRAF = t;
     });
@@ -439,8 +400,4 @@ class CharacterControllerDemo {
   }
 }
 
-let _APP = null;
-
-window.addEventListener('DOMContentLoaded', () => {
-  _APP = new CharacterControllerDemo();
-});
+let _APP = new CharacterControllerDemo();
