@@ -12,8 +12,10 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import Swal from 'sweetalert2';
 
 let cam;
+let globalScene;
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -48,6 +50,7 @@ class BasicCharacterController {
     const loader = new GLTFLoader();
     loader.load('./src/components/objects/girl/girl.gltf', (gltf) => {
       gltf.scene.scale.setScalar(3);
+      gltf.scene.position.add(new THREE.Vector3(20, 0, 230))
       this._target = gltf.scene;
       this._params.scene.add(this._target);
       this._mixer = new THREE.AnimationMixer(this._target);
@@ -72,12 +75,24 @@ class BasicCharacterController {
     });
   }
 
+  // update avatar and camera position
+  UpdatePosition(forward, sideways, controlObject) {
+    let new_pos = controlObject.position.clone().add(forward).clone().add(sideways);
+    if (new_pos.x >= -50 && new_pos.x <= 50 && new_pos.z >= -180 && new_pos.z <= 230) {
+      controlObject.position.add(forward).clone().add(sideways);
+      cam.position.add(forward).clone().add(sideways);
+    }
+  }
+
   Update(timeInSeconds) {
     if (!this._target) {
       return;
     }
 
     this._stateMachine.Update(timeInSeconds, this._input);
+
+    const speed = globalScene.state['speed'];
+    this._acceleration.z = speed;
 
     const velocity = this._velocity;
     const frameDecceleration = new THREE.Vector3(
@@ -128,11 +143,7 @@ class BasicCharacterController {
     sideways.multiplyScalar(velocity.x * timeInSeconds);
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
-    controlObject.position.add(forward);
-    controlObject.position.add(sideways);
-    
-    cam.position.add(forward);
-    cam.position.add(sideways);
+    this.UpdatePosition(forward, sideways, controlObject);
 
     if (this._mixer) {
       this._mixer.update(timeInSeconds);
@@ -326,7 +337,6 @@ class CharacterControllerDemo {
     });
     this._threejs.outputEncoding = THREE.sRGBEncoding;
     this._threejs.shadowMap.enabled = true;
-    this._threejs.shadowMap.type = THREE.PCFSoftShadowMap;
     this._threejs.setPixelRatio(window.devicePixelRatio);
     this._threejs.setSize(window.innerWidth, window.innerHeight);
 
@@ -341,10 +351,11 @@ class CharacterControllerDemo {
     const near = 1.0;
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this._camera.position.set(50, 10, 0);
+    this._camera.position.set(20, 10, 250);
 
     const scene = new SeedScene();
     this._scene = scene;
+    globalScene = this._scene;
 
     cam = this._camera;
     const controls = new OrbitControls(
@@ -362,16 +373,16 @@ class CharacterControllerDemo {
   _LoadAnimatedModel() {
     const params = {
       camera: cam,
-      scene: this._scene,
+      scene: globalScene,
     }
     this._controls = new BasicCharacterController(params);
   }
 
   _OnWindowResize() {
     const { innerHeight, innerWidth } = window;
-    renderer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
+    this._threejs.setSize(innerWidth, innerHeight);
+    cam.aspect = innerWidth / innerHeight;
+    cam.updateProjectionMatrix();
   }
 
   _RAF() {
@@ -399,5 +410,35 @@ class CharacterControllerDemo {
     }
   }
 }
+
+Swal.fire({
+  title: 'Welcome to A Walk Down Nassau Street!',
+  showCancelButton: true,
+  confirmButtonText: 'Next',
+  cancelButtonText: 'Close',
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire({
+      title: 'Avatar Controls',
+      html: 'To move the avatar, use the W (move forward), S (move backward), A (turn left), and D (turn right) keys',
+      showCancelButton: true,
+      confirmButtonText: 'Next',
+      cancelButtonText: 'Close',
+    }).then((result) => {
+      Swal.fire({
+        title: 'Camera Controls',
+        html: 'The camera will follow the avatar as it moves. You can move the camera using the up, down, left, and right arrow keys.',
+        showCancelButton: true,
+        confirmButtonText: 'Next',
+        cancelButtonText: 'Close',
+      }).then((result) => {
+        Swal.fire('Avatar Speed', 'You can control the avatar speed by adjusting the speed bar in the top right corner.').then(() => 
+        {
+          Swal.fire('You have completed the tutorial.')
+        })
+      })
+    })
+  }
+})
 
 let _APP = new CharacterControllerDemo();
