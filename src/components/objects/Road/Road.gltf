@@ -17,21 +17,21 @@
             "mesh" : 0,
             "name" : "Plane",
             "scale" : [
-              2,
-              10,
-              50
+                8.041783332824707,
+                24.16313934326172,
+                52.21980285644531
             ],
             "translation" : [
-              30,
-              3,
-              30
+                51.776649475097656,
+                1.0565125942230225,
+                28.313865661621094
             ]
         }
     ],
     "materials" : [
         {
             "doubleSided" : true,
-            "name" : "Material.001",
+            "name" : "Material.025",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0
@@ -67,7 +67,7 @@
         {
             "bufferView" : 4,
             "mimeType" : "image/png",
-            "name" : "road"
+            "name" : "Image_0"
         }
     ],
     "accessors" : [
