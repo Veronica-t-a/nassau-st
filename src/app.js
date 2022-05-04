@@ -11,7 +11,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -43,23 +43,18 @@ class BasicCharacterController {
   }
 
   _LoadModels() {
-    const loader = new FBXLoader();
-    loader.setPath('./src/components/objects/girl/');
-    loader.load('girl.fbx', (fbx) => {
-      fbx.scale.setScalar(0.03);
-
-      this._target = fbx;
+    const loader = new GLTFLoader();
+    loader.load('src/components/objects/girl/girl.gltf', (gltf) => {
+      gltf.scene.scale.setScalar(3);
+      this._target = gltf.scene;
       this._params.scene.add(this._target);
-
       this._mixer = new THREE.AnimationMixer(this._target);
-
       this._manager = new THREE.LoadingManager();
       this._manager.onLoad = () => {
         this._stateMachine.SetState('idle');
       };
-
       const _OnLoad = (animName, anim) => {
-        const clip = anim.animations[0];
+        const clip = anim.animations[anim.animations.length - 1];
         const action = this._mixer.clipAction(clip);
   
         this._animations[animName] = {
@@ -68,10 +63,10 @@ class BasicCharacterController {
         };
       };
 
-      const loader = new FBXLoader(this._manager);
-      loader.setPath('./src/components/objects/girl/');
-      loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
-      loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
+      const loader = new GLTFLoader(this._manager);
+      loader.setPath('src/components/objects/girl/');
+      loader.load('walk.gltf', (a) => { _OnLoad('walk', a); });
+      loader.load('idle.gltf', (a) => { _OnLoad('idle', a); });
     });
   }
 
@@ -244,7 +239,6 @@ class CharacterFSM extends FiniteStateMachine {
   }
 };
 
-
 class State {
   constructor(parent) {
     this._parent = parent;
@@ -306,6 +300,7 @@ class IdleState extends State {
   }
 
   Enter(prevState) {
+    console.log(this._parent._proxy._animations)
     const idleAction = this._parent._proxy._animations['idle'].action;
     if (prevState) {
       const prevAction = this._parent._proxy._animations[prevState.Name].action;
