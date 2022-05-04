@@ -13,6 +13,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import Swal from 'sweetalert2';
+import GIRL from './components/objects/girl/Girl.gltf';
+import WALK from './components/objects/girl/Walk.gltf';
+import IDLE from './components/objects/girl/Idle.gltf';
 
 let cam;
 let globalScene;
@@ -48,7 +51,7 @@ class BasicCharacterController {
 
   _LoadModels() {
     const loader = new GLTFLoader();
-    loader.load('./src/components/objects/girl/girl.gltf', (gltf) => {
+    loader.load(GIRL, (gltf) => {
       gltf.scene.scale.setScalar(3);
       gltf.scene.position.add(new THREE.Vector3(20, 0, 230))
       this._target = gltf.scene;
@@ -69,9 +72,8 @@ class BasicCharacterController {
       };
 
       const loader = new GLTFLoader(this._manager);
-      loader.setPath('./src/components/objects/girl/');
-      loader.load('walk.gltf', (a) => { _OnLoad('walk', a); });
-      loader.load('idle.gltf', (a) => { _OnLoad('idle', a); });
+      loader.load(WALK, (a) => { _OnLoad('walk', a); });
+      loader.load(IDLE, (a) => { _OnLoad('idle', a); });
     });
   }
 
@@ -91,6 +93,7 @@ class BasicCharacterController {
 
     this._stateMachine.Update(timeInSeconds, this._input);
 
+    // get and update acceleration
     const speed = globalScene.state['speed'];
     this._acceleration.z = speed;
 
@@ -220,7 +223,6 @@ class FiniteStateMachine {
       if (prevState.Name == name) {
         return;
       }
-      prevState.Exit();
     }
 
     const state = new this._states[name](this);
@@ -256,7 +258,6 @@ class State {
   }
 
   Enter() {}
-  Exit() {}
   Update() {}
 };
 
@@ -289,9 +290,6 @@ class WalkState extends State {
     enter('walk', prevState, this._parent._proxy);
   }
 
-  Exit() {
-  }
-
   Update(timeElapsed, input) {
     if (input._keys.forward || input._keys.backward) {
       return;
@@ -313,9 +311,6 @@ class IdleState extends State {
 
   Enter(prevState) {
     enter('idle', prevState, this._parent._proxy)
-  }
-
-  Exit() {
   }
 
   Update(_, input) {
@@ -424,14 +419,14 @@ Swal.fire({
       showCancelButton: true,
       confirmButtonText: 'Next',
       cancelButtonText: 'Close',
-    }).then((result) => {
+    }).then(() => {
       Swal.fire({
         title: 'Camera Controls',
         html: 'The camera will follow the avatar as it moves. You can move the camera using the up, down, left, and right arrow keys.',
         showCancelButton: true,
         confirmButtonText: 'Next',
         cancelButtonText: 'Close',
-      }).then((result) => {
+      }).then(() => {
         Swal.fire('Avatar Speed', 'You can control the avatar speed by adjusting the speed bar in the top right corner.').then(() => 
         {
           Swal.fire('You have completed the tutorial.')
