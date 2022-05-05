@@ -11,3 +11,4 @@ export * from './Tree';
 export * from './Road';
 export * from './Hjewelers';
 export * from './Sidewalk';
+export * from './Cloud';
