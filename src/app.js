@@ -53,7 +53,7 @@ class BasicCharacterController {
     const loader = new GLTFLoader();
     loader.load(GIRL, (gltf) => {
       gltf.scene.scale.setScalar(3);
-      gltf.scene.position.add(new THREE.Vector3(20, 0, 230))
+      gltf.scene.position.add(new THREE.Vector3(0, 1, 230))
       this._target = gltf.scene;
       this._params.scene.add(this._target);
       this._mixer = new THREE.AnimationMixer(this._target);
@@ -64,7 +64,7 @@ class BasicCharacterController {
       const _OnLoad = (animName, anim) => {
         const clip = anim.animations[anim.animations.length - 1];
         const action = this._mixer.clipAction(clip);
-  
+
         this._animations[animName] = {
           clip: clip,
           action: action,
@@ -156,7 +156,7 @@ class BasicCharacterController {
 
 class BasicCharacterControllerInput {
   constructor() {
-    this._Init();    
+    this._Init();
   }
 
   _Init() {
@@ -218,7 +218,7 @@ class FiniteStateMachine {
 
   SetState(name) {
     const prevState = this._currentState;
-    
+
     if (prevState) {
       if (prevState.Name == name) {
         return;
@@ -346,7 +346,7 @@ class CharacterControllerDemo {
     const near = 1.0;
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this._camera.position.set(20, 10, 250);
+    this._camera.position.set(0, 10, 250);
 
     const scene = new SeedScene();
     this._scene = scene;
@@ -427,7 +427,7 @@ Swal.fire({
         confirmButtonText: 'Next',
         cancelButtonText: 'Close',
       }).then(() => {
-        Swal.fire('Avatar Speed', 'You can control the avatar speed by adjusting the speed bar in the top right corner.').then(() => 
+        Swal.fire('Avatar Speed', 'You can control the avatar speed by adjusting the speed bar in the top right corner.').then(() =>
         {
           Swal.fire('You have completed the tutorial.')
         })
