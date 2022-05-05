@@ -12,3 +12,6 @@ export * from './Road';
 export * from './Hjewelers';
 export * from './Sidewalk';
 export * from './Cloud';
+export * from './LastBuilding';
+export * from './Lamp';
+export * from './Alley';
